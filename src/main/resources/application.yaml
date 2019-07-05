@@ -6,4 +6,4 @@ spring:
       username: weixin
       password: weixin
       
-server.port: 8185
+server.port: 8008
