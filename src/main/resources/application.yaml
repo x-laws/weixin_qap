@@ -6,4 +6,10 @@ spring:
       username: weixin
       password: weixin
       
-server.port: 8008
+   redis:
+      host: 47.103.20.149 
+      port: 6379
+      # 数据库只能是0~15，因为目前使用的是默认设置，最多16个数据库
+      database: 15
+
+server.port: 8085

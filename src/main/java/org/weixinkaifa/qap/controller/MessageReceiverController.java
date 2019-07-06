@@ -3,9 +3,13 @@ package org.weixinkaifa.qap.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.weixinkaifa.qap.dumain.InMessage;
+import org.weixinkaifa.qap.service.MessageConvertHelper;
 
 @RestController
 @RequestMapping("/qap/message/receiver")
@@ -28,4 +32,74 @@ private static final Logger LOG = LoggerFactory.getLogger(MessageReceiverControl
 	) {
 		return echostr;
 	}
-}
+	@PostMapping
+	// @RequestBody注解表示把请求内容获取出来，并且转换为String传入给xml参数。
+	public String onMessage(//
+			@RequestParam("signature") String signature, //
+			@RequestParam("timestamp") String timestamp, //
+			@RequestParam("nonce") String nonce, //
+			@Request Body String xml) {JsonParseException, JsonMappingException, IOException{
+		// 收到消息
+		// {}是占位符，第一个{}会把第二个参数的值自动填入
+		// LOG.trace必须要求日志记录器的配置为trace级别才能输出
+		LOG.trace("收到的消息原文：\n{}\n------------------------------", xml);
+		// 转换消息
+
+		// 转换消息1.获取消息的类型
+//		String type = xml.substring(xml.indexOf("<MsgType><![CDATA[") + 18);
+//		type = type.substring(0, type.indexOf("]"));
+		// 转换消息2.根据消息类型，把XML转换为对应类型的对象
+//		if (type.equals("text")) {
+//			InMessage x = new TextInMessage();
+//		} else if (type.equals("image")) {
+//			InMessage x = new ImageInMessage();
+//		} else if (type.equals("vioce")) {
+//			InMessage x = new TextInMessage();
+//		} else if (type.equals("video")) {
+//			InMessage x = new TextInMessage();
+//		}
+
+		// InMessage inMessage = MessageConvertHelper.convert(xml);
+
+		InMessage inMessage = MessageConvertHelper.convert(xml);
+ 
+		if (inMessage == null) {
+			LOG.error("消息无法转换！原文：\n{}\n", xml);
+			// 消息无法转换
+			return "success";
+		}
+
+		LOG.debug("转换后的消息对象\n{}\n", inMessage);
+
+		String channel = "kemao_2_" + inMessage.getMsgType();
+		// 把消息丢入队列
+		// 1.完成对象的序列化
+//		ByteArrayOutputStream bos = new ByteArrayOutputStream();// 字节输出流
+//		ObjectOutputStream out = new ObjectOutputStream(bos);
+//		out.writeObject(inMessage);
+//
+//		byte[] data = bos.toByteArray();// 序列化之后的字节数组
+
+		// 2.把序列化后对象放入队列里面
+//		inMessageTemplate.execute(new RedisCallback<InMessage>() {
+//
+//			@Override
+//			public InMessage doInRedis(RedisConnection connection) throws DataAccessException {
+//				// 建议不同的人分开前缀
+//				
+//				connection.publish(channel.getBytes(), data);
+//
+//				return null;
+//			}
+//		});
+
+		// 直接把对象发送出去，调用ValueSerializer来实现对象的序列化和反序列
+		inMessageTemplate.convertAndSend(channel, inMessage);
+
+		// 消费队列中的消息
+		// 产生客服消息
+
+		return "success";
+	}
+
+	

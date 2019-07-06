@@ -76,5 +76,7 @@ public abstract class InMessage implements Serializable{
 	public void setMsgId(Long msgId) {
 		this.msgId = msgId;
 	}
+	 
+	abstract public String toString();
 
 }
