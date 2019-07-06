@@ -36,6 +36,7 @@ public class MessageConvertHelper {
 				Class<? extends InMessage> c = typeMap.get(type);
 				
 				
+				@SuppressWarnings("unchecked")
 				T msg = (T) JAXB.unmarshal(new StringReader(xml), c);
 				return msg;
 	}
