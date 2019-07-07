@@ -31,10 +31,11 @@ public class MessageReceiverController {
 
 	// 日志记录器
 	private static final Logger LOG = LoggerFactory.getLogger(MessageReceiverController.class);
-
-	// 这种是属性注入，相当于是XML文件中的<property>元素
 	@Autowired
 	private XmlMapper xmlMapper;
+	
+
+	// 这种是属性注入，相当于是XML文件中的<property>元素
 	@Autowired
 	private RedisTemplate<String, ? extends InMessage> inMessageTemplate;
 
@@ -78,7 +79,15 @@ public class MessageReceiverController {
 //			InMessage x = new TextInMessage();
 //		}
 
-		InMessage inMessage = MessageConvertHelper.convert(xml);
+		//InMessage inMessage = MessageConvertHelper.convert(xml);
+		
+		InMessage inMessage = convert(xml);
+		
+		if(inMessage == null) { 
+			LOG.error("消息无法转换！原文:\n{}\n",xml);
+			return "success";
+		}
+		
 		LOG.debug("转换后的消息对象\n{}\n", inMessage);
 		/*
 		 * InMessage inMessage = convert(xml);
@@ -118,6 +127,12 @@ public class MessageReceiverController {
 		// 产生客服消息
 
 		return "success";
+	}
+
+	private InMessage convert(String xml) throws JsonParseException, JsonMappingException, IOException {
+		Class<? extends InMessage> c = MessageConvertHelper.getClass(xml);
+		InMessage msg = xmlMapper.readValue(xml, c);
+		return msg;
 	}
 	
 }

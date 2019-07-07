@@ -26,14 +26,25 @@ public class MessageConvertHelper {
 		
 	}
 	
+	public static Class<? extends InMessage> getClass(String xml) {
+		String type = xml.substring(xml.indexOf("<MsgType><![CDATA[") + 18);
+		type = type.substring(0, type.indexOf("]"));
+
+		Class<? extends InMessage> c = typeMap.get(type);
+		return c;
+		
+	}
+	
 	public static <T extends InMessage> T convert(String xml) {
 		
 		
 		// 获取类型
 				String type = xml.substring(xml.indexOf("<MsgType><![CDATA[") + 18);
 				type = type.substring(0, type.indexOf("]"));
-
-				Class<? extends InMessage> c = typeMap.get(type);
+				Class<? extends InMessage> c = getClass(xml);
+				if (c == null) {
+					return null;
+				}
 				
 				
 				@SuppressWarnings("unchecked")
