@@ -30,7 +30,8 @@ public class TextInMessage extends InMessage {
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
-		return null;
+		return "TextInMessage [content=" + content + ", getToUserName()=" + getToUserName() + ", getFromUserName()="
+				+ getFromUserName() + ", getCreateTime()=" + getCreateTime() + ", getMsgType()=" + getMsgType()
+				+ ", getMsgId()=" + getMsgId() + "]";
 	}
 }
